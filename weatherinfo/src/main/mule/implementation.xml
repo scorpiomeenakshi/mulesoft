@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="implementationFlow" doc:id="0439ef94-9d4b-49e1-889b-d6c96f2bc3d1" >
+		<set-variable value="#[attributes.queryParams.city]" doc:name="SetCity" doc:id="3890bf77-bbbe-4519-a022-c7b5bfe3050c" variableName="city"/>
+		<http:request method="GET" doc:name="Request" doc:id="dfcd17d0-8aea-4042-8846-aacff34775b0" url="${weather.url}">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"q" : vars.city,
+	"APPID" : p('weather.appid'),
+	"units" : "metric"
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="cd89b1bd-5fcb-40dc-8122-43cbba678be7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	city: vars.city,
+	currtemp: payload.main.temp as String ++ " degree celcius",
+	mintemp: payload.main.temp_min as String ++ " degree celcius",
+	maxtemp: payload.main.temp_max as String ++ " degree celcius"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

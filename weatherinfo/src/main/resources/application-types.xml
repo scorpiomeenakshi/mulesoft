@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="weather" format="json">
+      <types:shape format="weave" example="examples/weatherinfo.json"><![CDATA[%dw 2.0
+
+type weather = {|
+  coord: {|
+    lon: Number {"typeId": "double"}, 
+    lat: Number {"typeId": "double"}
+  |}, 
+  weather: Array<{|    id: Number {"typeId": "int"},     main: String,     description: String,     icon: String  |}>, 
+  base: String, 
+  main: {|
+    temp: Number {"typeId": "double"}, 
+    feels_like: Number {"typeId": "double"}, 
+    temp_min: Number {"typeId": "double"}, 
+    temp_max: Number {"typeId": "double"}, 
+    pressure: Number {"typeId": "int"}, 
+    humidity: Number {"typeId": "int"}
+  |}, 
+  visibility: Number {"typeId": "int"}, 
+  wind: {|
+    speed: Number {"typeId": "double"}, 
+    deg: Number {"typeId": "int"}
+  |}, 
+  clouds: {| all: Number {"typeId": "int"} |}, 
+  dt: Number {"typeId": "int"}, 
+  sys: {|
+    "type": Number {"typeId": "int"}, 
+    id: Number {"typeId": "int"}, 
+    country: String, 
+    sunrise: Number {"typeId": "int"}, 
+    sunset: Number {"typeId": "int"}
+  |}, 
+  timezone: Number {"typeId": "int"}, 
+  id: Number {"typeId": "int"}, 
+  name: String, 
+  cod: Number {"typeId": "int"}
+|} {"example": "{\\\"coord\\\":{\\\"lon\\\":-0.13,\\\"lat\\\":51.51},\\\"weather\\\":[{\\\"id\\\":721,\\\"main\\\":\\\"Haze\\\",\\\"description\\\":\\\"haze\\\",\\\"icon\\\":\\\"50d\\\"}],\\\"base\\\":\\\"stations\\\",\\\"main\\\":{\\\"temp\\\":8.68,\\\"feels_like\\\":5.6,\\\"temp_min\\\":7.22,\\\"temp_max\\\":10.56,\\\"pressure\\\":1026,\\\"humidity\\\":93},\\\"visibility\\\":4100,\\\"wind\\\":{\\\"speed\\\":3.6,\\\"deg\\\":90},\\\"clouds\\\":{\\\"all\\\":55},\\\"dt\\\":1586500696,\\\"sys\\\":{\\\"type\\\":1,\\\"id\\\":1414,\\\"country\\\":\\\"GB\\\",\\\"sunrise\\\":1586495681,\\\"sunset\\\":1586544500},\\\"timezone\\\":3600,\\\"id\\\":2643743,\\\"name\\\":\\\"London\\\",\\\"cod\\\":200}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="att" format="java">
+      <types:shape format="java" element="org.mule.extension.http.api.BaseHttpRequestAttributes"/>
+    </types:type>
+    <types:type name="res" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#cd89b1bd-5fcb-40dc-8122-43cbba678be7">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="weather"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0439ef94-9d4b-49e1-889b-d6c96f2bc3d1">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="att"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

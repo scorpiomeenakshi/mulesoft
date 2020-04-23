@@ -1,0 +1,4 @@
+weather:
+  url: "http://api.openweathermap.org/data/2.5/weather"
+  appid: "c13de1db6d2fa244f824377917e8a7fb"
+  
