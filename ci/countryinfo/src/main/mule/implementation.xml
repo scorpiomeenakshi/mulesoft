@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd">
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="80b3628d-f09b-4270-b021-e87e826df73b" >
+		<wsc:connection soapVersion="SOAP12" wsdlLocation="http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?wsdl" service="CountryInfoService" port="CountryInfoServiceSoap" address="http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso" />
+	</wsc:config>
+<!-- 	<db:config name="Database_Config" doc:name="Database Config" doc:id="f6b53bae-a6ce-4419-91a3-fd38cfd33c69" >
+		<db:data-source-connection />
+	</db:config> -->
+	<xml-module:config name="XML_Config" doc:name="XML Config" doc:id="589ebe75-7a98-4c05-b96d-c1d35753f403" />
+	<flow name="implementationFlow" doc:id="39f15b1d-bbe4-4a79-990b-2fd1b4d13761" >
+		<set-payload value="${file::country-mapping.xml}" doc:name="Set Payload" doc:id="ca111a8f-7514-4063-b5a8-d9bb5dd4dea2" mimeType="application/xml"/>
+		<set-variable value="#[attributes.queryParams.country]" doc:name="Set Variable" doc:id="6786e850-9b6f-4258-8e38-01205910b5f0" variableName="country" />
+		<ee:transform doc:name="Transform Message" doc:id="79df46b2-602c-4c26-8fd5-c7ef2590dc7b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.oorsprong.org/websamples.countryinfo
+---
+{
+	ns0#FullCountryInfo: {
+		ns0#sCountryISOCode: (payload.countryList.*country[?($.Name==vars.country)].isoCode)	
+		}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="84d734ee-44db-404b-b6bd-43704f1d993a" config-ref="Web_Service_Consumer_Config" operation="FullCountryInfo"/>
+		<ee:transform doc:name="Transform Message" doc:id="4ee04485-5c3e-4f4b-98d7-64916f2d0ed2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.oorsprong.org/websamples.countryinfo
+---
+{
+	CountryName: payload.body.ns0#FullCountryInfoResponse.ns0#FullCountryInfoResult.ns0#sName default "",
+	Capital: payload.body.ns0#FullCountryInfoResponse.ns0#FullCountryInfoResult.ns0#sCapitalCity default "",
+	Language: payload.body.ns0#FullCountryInfoResponse.ns0#FullCountryInfoResult.ns0#Languages.ns0#tLanguage.ns0#sName default "",
+	PhoneCode: payload.body.ns0#FullCountryInfoResponse.ns0#FullCountryInfoResult.ns0#sPhoneCode default "",
+	CurrencyCode: payload.body.ns0#FullCountryInfoResponse.ns0#FullCountryInfoResult.ns0#sCurrencyISOCode default ""
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

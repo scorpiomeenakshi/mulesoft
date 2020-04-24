@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="attr" format="java">
+      <types:shape format="java" element="org.mule.extension.http.api.BaseHttpRequestAttributes"/>
+    </types:type>
+    <types:type name="country" format="json">
+      <types:shape format="weave" example="examples/countryInfoResponse.json"><![CDATA[%dw 2.0
+
+type country = {|
+  CountryName: String, 
+  Capital: String, 
+  Language: String, 
+  PhoneCode: String, 
+  CurrencyCode: String
+|} {"example": "{\\\"CountryName\\\":\\\"India\\\",\\\"Capital\\\":\\\"New Delhi\\\",\\\"Language\\\":\\\"Hindi\\\",\\\"PhoneCode\\\":\\\"91\\\",\\\"CurrencyCode\\\":\\\"INR\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="countrymap" format="xml">
+      <types:example format="xml" element="ListOfCountryNamesByNameResult" location="country-mapping.xml"/>
+    </types:type>
+    <types:type name="isoCode" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#6786e850-9b6f-4258-8e38-01205910b5f0">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="attr"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#4ee04485-5c3e-4f4b-98d7-64916f2d0ed2">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="country"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
