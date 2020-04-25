@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="sendSMS" format="json">
+      <types:shape format="weave" example="examples/sendsmsreq.json"><![CDATA[%dw 2.0
+
+type sendSMS = {|
+  toEmail: String, 
+  message: String
+|} {"example": "{\\\"toEmail\\\":\\\"a@a.com\\\",\\\"message\\\":\\\"Hello World\\\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#ee06b31c-e725-406a-83ea-d73f7fcc5b21">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="sendSMS"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#a6198bdf-4b4e-43ee-9b37-d06d1ebe3f64">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="sendSMS"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

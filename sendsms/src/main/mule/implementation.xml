@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="0ca6ec10-6e76-4f2d-aca4-895e1834b205" basePath="/${twillio.url}">
+		<http:request-connection protocol="HTTPS" host="${twillio.host}">
+			<http:authentication >
+				<http:basic-authentication username="${secure::username}" password="${secure::password}" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<flow name="implementationFlow" doc:id="a6198bdf-4b4e-43ee-9b37-d06d1ebe3f64" >
+		<ee:transform doc:name="Transform Message" doc:id="ee06b31c-e725-406a-83ea-d73f7fcc5b21" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output multipart/form-data
+---
+{
+	parts:{
+		Body:{
+			headers:{
+				"Content-Type": "text/plain"
+			},
+			content: payload.message as String
+		},
+		From: {
+			headers:{
+				"Content-Type": "text/plain"
+			},
+			content: p('twillio.number')
+		},
+		To:{
+			headers:{
+				"Content-Type": "text/plain"
+			},
+			content: payload.toPhone as String
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="3399feb0-c941-49b5-a5b5-8fdb84762587" config-ref="HTTP_Request_configuration" url="https://${twillio.host}/${twillio.url}">
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="cb230a0b-059e-476b-9326-2dd348d010f9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": "Message Sent Successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
