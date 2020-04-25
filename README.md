@@ -3,4 +3,5 @@ This repository contains MuleSoft sample projects that promote easy learning of 
 
 1. HelloWorld : Displays "Hello World" or "Hello Name" if Name is passed as a query parameter
 2. WeatherInfo: This example demonstrates the invocation of an external REST API  (https://openweathermap.org/current)
-3. CountryInfo: This example demonstrates invocation of an external web service and demonstrates the use of an XML mapping file to map a field, (WSDL - http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?wsdl)
+3. CountryInfo: This example demonstrates invocation of an external WSDL service and the use of an XML mapping file to map a field, (WSDL - http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?wsdl)
+4. sendSMS: This example calls a twillio REST API and demonstrates invocation of a REST API using HTTP Basic Authentication, transformation to multipart/form-data and how to use a secure properties file
