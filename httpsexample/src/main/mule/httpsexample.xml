@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="0a2f729d-3758-4576-afc7-de1c7bf561a1" >
+		<http:listener-connection protocol="HTTPS" host="0.0.0.0" port="8082" >
+			<tls:context >
+				<tls:key-store type="jks" alias="mule" keyPassword="${secure::mule.password}" password="${secure::mule.password}" path="keystore/mule.jks"/>
+			</tls:context>
+		</http:listener-connection>
+	</http:listener-config>
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="3ac7af5b-3eb6-446f-8fc1-c43fa4376dd0" file="secure.properties" key="${key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<global-property doc:name="Global Property" doc:id="7c1224eb-7dbe-44cb-8c12-f321c1290185" name="key" value="key" />
+	<flow name="httpsexampleFlow" doc:id="d4c319e3-4712-4e7d-86ac-4d6163c1bf59" >
+		<http:listener doc:name="Listener" doc:id="ad4ebb0a-95ad-4427-8b5f-cf1f3d43bd9a" path="/api/hello" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Transform Message" doc:id="63473efd-dd4a-4eab-b036-284fd69f0c15" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Hello World!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
